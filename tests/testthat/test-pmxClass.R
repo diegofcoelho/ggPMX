@@ -140,3 +140,17 @@ test_that("can create a controller with data.frame as input", {
 
   expect_equal(nrow(ctr4 %>% get_data("input")), nrow(dat))
 })
+
+test_that("can create a controller from mlxtran with explicit path", {
+  mlxtran_path <- file.path(system.file(package = "ggPMX"), "testdata", "1_popPK_model", "project.mlxtran")
+  ctr <- pmx_mlxtran(file_name = mlxtran_path)
+  expect_is(ctr, "pmxClass")
+})
+
+test_that("can catch absence of minor or major version, when wildcard is used in file_name", {
+  mlxtran_path <- file.path(system.file(package = "ggPMX"), "tes*tdata", "1_popPK_model", "project.mlxtran")
+  error_msg = "Using wildcard in file_name assume providing non-negative minor and major version"
+  expect_error(pmx_mlxtran(file_name = mlxtran_path), error_msg, fixed=TRUE)
+  expect_error(pmx_mlxtran(file_name = mlxtran_path, major_version = 5), error_msg, fixed=TRUE)
+  expect_error(pmx_mlxtran(file_name = mlxtran_path, minor_version = 5), error_msg, fixed=TRUE)
+})
