@@ -164,10 +164,10 @@ pmx_mlx <-
 
 pmx_mlxtran <- function(file_name, config = "standing", call = FALSE, endpoint, major_version = -1, minor_version = -1,  ...) {
   # Substituting * with version in file_name
-  if (grepl("*",file_name, fixed = TRUE)) {
+  if (grepl("*", file_name, fixed = TRUE)) {
     assert_that(minor_version>=0 && major_version>=0, msg = "Using wildcard in file_name assume providing non-negative minor and major version")
-    file_name <- gsub("*",paste(major_version,minor_version,"",sep ="."),file_name, fixed = TRUE)
-  }
+    file_name <- gsub("*", paste(major_version,minor_version, "", sep ="."), file_name, fixed = TRUE)
+  } 
   params <- parse_mlxtran(file_name)
   rr <- as.list(match.call()[-1])
   rr$file_name <- NULL
