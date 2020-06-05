@@ -178,13 +178,13 @@ pmx_mlxtran <- function(file_name, config = "standing", call = FALSE, endpoint, 
     params$endpoint <- NULL
     params$endpoint <- endpoint
   }
-  
-  
+
+
   if (call) {
     params$call <- NULL
     return(params)
   }
-  
+
   params$call <- NULL
   # We don't need to pass version to pmx_mlx
   params$minor_version <- NULL
