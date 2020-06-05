@@ -148,8 +148,8 @@ pmx_mlx <-
 #' @param call \code{logical} if TRUE the result is the parameters parsed
 #' @param major_version \code{integer} Non-negative integer. Non-obligatory option, if you don't use wildcard in file_name
 #' Otherwise you MUST provide major_version and wildcard will be substituted with "major_version.minor_version."
-#' @param minor_version \code{integer} Non-negative integer. Non-obligatory option, if you don't use wildcard in file_name
-#' Otherwise you MUST provide minor_version and wildcard will be substituted with "major_version.minor_version."
+#' @param minor_version \code{integer} Non-negative integer. Non-obligatory option, if you don't use a wildcard in the file_name.
+#' Otherwise you MUST provide minor_version and wildcard will be substituted with "major_version.minor_version.", which represents the mlxtran model version.
 #' @param ... extra arguments passed to pmx_mlx.
 #' @rdname pmx
 #'
