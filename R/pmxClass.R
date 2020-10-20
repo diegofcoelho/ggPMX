@@ -1102,7 +1102,7 @@ print.pmxClass <- function(x, ...) {
 #' Technically speaking we talk about chaining not piping here. However ,
 #' using \code{pmx_copy} user can work on a copy of the controller.
 #'
-#' By defaul the copy don't keep global parameters setted using pmx_settings.
+#' By default the copy don't keep global parameters setted using pmx_settings.
 
 #'
 #' @examples
@@ -1114,13 +1114,14 @@ pmx_copy <- function(ctr, keep_globals = FALSE, ...) {
   cctr <- ctr$clone()
   params <- as.list(match.call(expand.dots = TRUE))[-1]
   params <- lang_to_expr(params)
-
+  
   ## params <- list(...)
   if (!keep_globals) {
     nn <- rev(names(formals(pmx_settings)))[-1]
     eff_nn <- intersect(nn, names(params))
+    settings <- l_left_join(ctr$settings, params[eff_nn]) 
     if (length(eff_nn) > 0) {
-      cctr$settings <- do.call(pmx_settings, params[eff_nn])
+      cctr$settings <- do.call(pmx_settings, settings) 
     }
   }
   cctr
