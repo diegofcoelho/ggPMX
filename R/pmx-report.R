@@ -21,6 +21,7 @@
 #' @export
 #' @importFrom rmarkdown draft render
 #' @importFrom knitr opts_chunk knit_hooks
+#' @importFrom tools file_path_as_absolute
 #' @details
 #' \code{pmx_report} uses pre-defined template .Rmd to generate the report.
 #' The idea is to pass the controller as a report argument using knitr \code{params} artifact.
@@ -104,7 +105,12 @@ pmx_report <-
     ))
 
     knitr::opts_chunk$set(fig.process = old_fig_process)
-
+    # I am getting an error that I believed was triggered here:
+    # 
+    # Error: Plot(s) were registered within ggPMX but were not rendered. Footnotes may be wrong.
+    # Called from: assert_that(is_empty_queue(self))
+    # 
+    # But it might be due the dataset I have used (data provided by biethbr1 on issue #110)
     pmx_fig_process_wrapup(contr)
 
     plot_dir <- sprintf("%s_files", name)
@@ -139,8 +145,27 @@ pmx_fig_process <- function(ctr, old_name, footnote, out_) {
 }
 
 pmx_draft <- function(ctr, name, template, edit) {
+  # draft throw an error if that name is used, so I just added an explanation about that to prevent its use.
+  if (grepl("skeleton.Rmd", template)) stop("`skeleton.Rmd` is a reserved template name used by rmarkdown::draft, please rename your template and try again.")
   template_file <- file.path(ctr$save_dir, sprintf("%s.Rmd", name))
+  user_template_file <- file_path_as_absolute(template)
   if (length(template_file) > 0 && file.exists(template_file)) {
+    # here I check if the Rmd that will be generated has the same name/path as the one saved currently on save_dir
+    if (template_file == user_template_file) {
+      # then we copy the one provided by the user, rename and fix the content of the template variable provided.
+      file.copy(template_file, file.path(ctr$save_dir, "report_template.Rmd"), overwrite = TRUE)
+      # in case the user provided the template file as a path, we need to account for that and replace for the new filename
+      # .Platform$file.sep suppose to make the process system agnostic but tests cross-platform are advisable 
+      prepath <- strsplit(template, .Platform$file.sep)[[1]]
+      template <- ifelse(length(prepath) == 1, prepath, 
+                         paste(paste(prepath[seq(1, length(prepath) - 1)],
+                                     collapse = .Platform$file.sep),
+                               "report_template.Rmd",
+                               sep = .Platform$file.sep)
+                         )
+    }
+    # then the destination file is deleted, what happens whether the template had such name or not.
+    # Virtually, both scenarios mentioned by `MorganePhilipp` are included in this fix.
     file.remove(template_file)
   }
   style_file <- file.path(ctr$save_dir, "header.tex")
@@ -224,7 +249,8 @@ create_ggpmx_gof <- function(save_dir, name) {
 }
 rm_dir <- function(to_remove) {
   if (!is.null(to_remove) && dir.exists(to_remove)) {
-    system(sprintf("rm -r %s", to_remove))
+    # adding the single quotes solved the problem for me (Windows 10)
+    system(sprintf("rm -r '%s'", to_remove))
   }
 }
 
